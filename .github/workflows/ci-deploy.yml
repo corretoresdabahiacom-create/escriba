@@ -29,8 +29,10 @@ jobs:
       - run: npm ci
       - name: Testes unitários
         run: npm test
-      - name: Instala Chromium (E2E)
-        run: npx playwright install --with-deps chromium
+      - name: Instala Chromium e poppler (validação do PDF)
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y --no-install-recommends poppler-utils
       - name: Testes E2E
         run: npm run test:e2e
 

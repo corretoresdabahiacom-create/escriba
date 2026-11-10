@@ -128,8 +128,12 @@ try {
     execFileSync('unzip', ['-tq', files.EPUB]); execFileSync('unzip', ['-tq', files.DOCX]);
     const listing = execFileSync('unzip', ['-l', files.EPUB], { encoding: 'utf8' });
     assert.match(listing, /images\/cover\.png/); assert.equal((listing.match(/chapter\d+\.xhtml/g) || []).length, 4);
-    const pdfInfo = execFileSync('pdfinfo', [files.PDF], { encoding: 'utf8' }); assert.match(pdfInfo, /Page size:\s+432 x 648/);
-    assert.match(execFileSync('pdftotext', [files.PDF, '-'], { encoding: 'utf8' }), /Sumário/);
+    assert.equal(fs.readFileSync(files.PDF).subarray(0, 5).toString(), '%PDF-');
+    let hasPoppler = true; try { execFileSync('pdfinfo', ['-v'], { stdio: 'ignore' }); } catch (e) { hasPoppler = e.code !== 'ENOENT'; }
+    if (hasPoppler) {
+      const pdfInfo = execFileSync('pdfinfo', [files.PDF], { encoding: 'utf8' }); assert.match(pdfInfo, /Page size:\s+432 x 648/);
+      assert.match(execFileSync('pdftotext', [files.PDF, '-'], { encoding: 'utf8' }), /Sumário/);
+    } else console.log('    (poppler ausente: validação detalhada do PDF ignorada)');
     const html = fs.readFileSync(files.HTML, 'utf8'); assert.match(html, /data:image\/png;base64/);
     assert.match(fs.readFileSync(files.Markdown, 'utf8'), /^# /);
     fs.copyFileSync(files.EPUB, path.join(OUT, 'final.epub')); fs.copyFileSync(files.DOCX, path.join(OUT, 'final.docx'));
