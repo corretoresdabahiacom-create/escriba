@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estúdio — Escriba</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314171F'/%3E%3Ctext x='16' y='23' font-size='22' text-anchor='middle' fill='%23C9A227' font-family='Georgia' font-style='italic'%3EE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<a class="skip" href="#app">Pular para o conteúdo</a>
+<header class="app-top">
+  <div class="bar">
+    <a class="brand" href="./">Escriba<span class="mark">.</span></a>
+    <div class="proj" id="projName"></div>
+    <div class="btn-row" style="gap:8px;">
+      <button class="btn-ghost sm" id="btnProjects" type="button">Meus livros</button>
+      <button class="btn-ghost sm" id="btnSettings" type="button">Configurações de IA</button>
+    </div>
+  </div>
+</header>
+
+<div id="app" class="shell" tabindex="-1"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<dialog id="dlg" aria-labelledby="dlgTitle"></dialog>
+
+<noscript><p style="padding:24px">O Escriba precisa de JavaScript para funcionar.</p></noscript>
+<script src="config.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

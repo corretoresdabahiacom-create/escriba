@@ -1,0 +1,13 @@
+# Configuração usada só nos testes E2E: sem binding de IA (evita exigir login) e com o provedor "mock".
+name = "escriba-e2e"
+main = "src/worker.js"
+compatibility_date = "2026-11-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[vars]
+MOCK_LLM = "1"
+RATE_LIMIT_PER_10MIN = "1000"

@@ -1,0 +1,9 @@
+# Copie para .dev.vars (ignorado pelo git) e preencha pelo menos uma chave.
+GROQ_API_KEY=
+GEMINI_API_KEY=
+OPENROUTER_API_KEY=
+ANTHROPIC_API_KEY=
+# Opcional: exige o cabeçalho x-access-code em /api/generate
+# ACCESS_CODE=
+# Opcional: modelos
+# GROQ_MODEL=llama-3.3-70b-versatile

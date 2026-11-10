@@ -1,0 +1,24 @@
+name = "escriba"
+main = "src/worker.js"
+compatibility_date = "2026-11-01"
+
+# Front-end estático + API no mesmo Worker. Só /api/* executa código (arquivos estáticos não consomem requisições do Worker).
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+# Workers AI: IA sem chave, na cota gratuita da conta (10 mil neurons/dia). Remova este bloco se não quiser usá-lo.
+[ai]
+binding = "AI"
+
+[vars]
+# Ordem de preferência quando o cliente pede "auto" (só entram os provedores com chave/binding configurados).
+PROVIDER_ORDER = "groq,gemini,openrouter,workersai,anthropic"
+# Origens extras autorizadas a chamar a API (ex.: o site no GitHub Pages). "*" libera qualquer origem.
+ALLOWED_ORIGINS = ""
+RATE_LIMIT_PER_10MIN = "60"
+
+# Segredos (NÃO coloque aqui — use `npx wrangler secret put NOME` ou o painel):
+#   GROQ_API_KEY, GEMINI_API_KEY, OPENROUTER_API_KEY, ANTHROPIC_API_KEY, ACCESS_CODE (opcional)
+# Modelos opcionais: GROQ_MODEL, GEMINI_MODEL, OPENROUTER_MODEL, ANTHROPIC_MODEL, WORKERS_AI_MODEL

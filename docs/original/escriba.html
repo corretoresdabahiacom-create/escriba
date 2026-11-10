@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escriba — Escreva o livro que só você poderia escrever</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171F;
+    --ink-2:#1D212C;
+    --paper:#EFEAE0;
+    --paper-dim:#C9C3B4;
+    --gold:#C9A227;
+    --rubric:#9A3B32;
+    --slate:#8A8F9C;
+    --line: rgba(239,234,224,0.14);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:600; letter-spacing:-0.01em;}
+  .mono{ font-family:'IBM Plex Mono', monospace; letter-spacing:0.02em; }
+  a{color:inherit;}
+
+  /* texture */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image: radial-gradient(rgba(239,234,224,0.035) 1px, transparent 1px);
+    background-size: 3px 3px;
+    pointer-events:none;
+    z-index:1;
+  }
+
+  .wrap{ max-width:1080px; margin:0 auto; padding:0 28px; position:relative; z-index:2;}
+
+  /* NAV */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(20,23,31,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; height:64px;}
+  .brand{ font-family:'Fraunces', serif; font-weight:700; font-size:20px; display:flex; align-items:center; gap:8px;}
+  .brand .mark{ color:var(--gold); font-style:italic; font-weight:500;}
+  nav .links{ display:flex; gap:28px; font-size:14px; color:var(--slate); }
+  nav .links a:hover{ color:var(--paper); }
+  .cta-nav{
+    background:var(--gold); color:var(--ink); padding:9px 18px; border-radius:3px;
+    font-size:14px; font-weight:600; text-decoration:none;
+  }
+  @media (max-width:720px){ nav .links{ display:none; } }
+
+  /* chapter marker */
+  .chapter-marker{
+    display:flex; align-items:center; gap:16px;
+    margin:0 auto 48px; max-width:1080px; padding:0 28px;
+  }
+  .chapter-marker .num{
+    font-family:'Fraunces', serif; font-style:italic; font-size:15px; color:var(--gold);
+    white-space:nowrap;
+  }
+  .chapter-marker .rule{ flex:1; height:1px; background:var(--line);}
+
+  section{ padding:96px 0; position:relative; }
+
+  /* HERO */
+  .hero{ padding-top:88px; padding-bottom:80px;}
+  .hero .wrap{ display:grid; grid-template-columns: 1.1fr 0.9fr; gap:56px; align-items:center; }
+  @media (max-width:900px){ .hero .wrap{ grid-template-columns:1fr; } }
+  .hero h1{
+    font-size:clamp(38px, 5.2vw, 60px); line-height:1.05; margin-bottom:24px;
+  }
+  .hero h1 em{ color:var(--gold); font-style:italic; font-weight:500; }
+  .hero p.lede{ font-size:18px; color:var(--paper-dim); max-width:480px; line-height:1.6; margin-bottom:32px;}
+  .btn-row{ display:flex; gap:14px; flex-wrap:wrap; align-items:center;}
+  .btn-primary{
+    background:var(--gold); color:var(--ink); padding:14px 26px; border:none; border-radius:3px;
+    font-size:15px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(201,162,39,0.25); }
+  .btn-ghost{
+    color:var(--paper); border:1px solid var(--line); padding:13px 24px; border-radius:3px;
+    font-size:15px; text-decoration:none; display:inline-block;
+  }
+
+  /* page-flip visual */
+  .book-visual{ position:relative; height:420px; perspective:1400px; }
+  .page{
+    position:absolute; inset:0; background:var(--paper); border-radius:4px;
+    box-shadow:0 30px 60px rgba(0,0,0,0.45);
+    padding:36px 32px; color:var(--ink);
+    transform-origin:left center;
+    animation: flip 7s ease-in-out infinite;
+  }
+  .page:nth-child(1){ animation-delay:0s; z-index:3;}
+  .page:nth-child(2){ background:#E6E0D2; z-index:2; transform:rotate(-1.5deg) translateX(6px);}
+  .page:nth-child(3){ background:#DCD5C4; z-index:1; transform:rotate(-3deg) translateX(12px);}
+  @keyframes flip{
+    0%, 40%{ transform:rotateY(0deg); }
+    55%{ transform:rotateY(-25deg); }
+    70%, 100%{ transform:rotateY(0deg); }
+  }
+  .page .cap{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em; color:var(--rubric); text-transform:uppercase; margin-bottom:14px;}
+  .page h3{ font-size:22px; margin-bottom:12px; color:var(--ink); }
+  .page p{ font-size:13.5px; line-height:1.7; color:#3A3A38; }
+  @media (max-width:900px){ .book-visual{ height:300px; margin-top:24px;} }
+
+  /* PROOF STRIP */
+  .proof{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:28px 0;}
+  .proof .wrap{ display:flex; gap:40px; flex-wrap:wrap; justify-content:space-between; align-items:center;}
+  .proof-item{ text-align:left; }
+  .proof-item .num{ font-family:'Fraunces', serif; font-size:28px; color:var(--gold); }
+  .proof-item .label{ font-size:12.5px; color:var(--slate); margin-top:2px;}
+
+  /* DEMO */
+  .demo-panel{
+    background:var(--ink-2); border:1px solid var(--line); border-radius:8px;
+    padding:32px; margin-top:40px;
+  }
+  .demo-grid{ display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+  @media (max-width:800px){ .demo-grid{ grid-template-columns:1fr; } }
+  label{ display:block; font-size:12.5px; color:var(--slate); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;}
+  input[type=text], select, textarea{
+    width:100%; background:var(--ink); border:1px solid var(--line); color:var(--paper);
+    padding:12px 14px; border-radius:4px; font-family:'IBM Plex Sans', sans-serif; font-size:14.5px;
+    margin-bottom:18px;
+  }
+  input:focus, select:focus, textarea:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+  .field-row{ display:flex; gap:14px; }
+  .field-row > div{ flex:1; }
+  .output-box{
+    background:var(--paper); color:var(--ink); border-radius:6px; padding:26px;
+    min-height:280px; font-size:14.5px; line-height:1.75; white-space:pre-wrap;
+    position:relative;
+  }
+  .output-box .placeholder{ color:#9a958a; font-style:italic; }
+  .output-box .cursor{ display:inline-block; width:2px; height:16px; background:var(--rubric); vertical-align:middle; animation:blink 1s step-end infinite;}
+  @keyframes blink{ 50%{ opacity:0; } }
+  .gen-btn{
+    background:var(--rubric); color:var(--paper); border:none; padding:13px 22px; border-radius:4px;
+    font-size:14.5px; font-weight:600; cursor:pointer; width:100%;
+  }
+  .gen-btn:disabled{ opacity:0.5; cursor:wait; }
+  .err{ color:var(--rubric); font-size:13px; margin-top:10px; white-space:pre-wrap; }
+
+  .chapter-block{ margin-bottom:22px; padding-bottom:22px; border-bottom:1px solid rgba(20,23,31,0.12); }
+  .chapter-block:last-child{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
+  .chapter-block .chap-label{ font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--rubric); display:block; margin-bottom:8px; }
+
+  .cover-card{
+    margin-top:10px; border-radius:8px; padding:32px 24px; text-align:center;
+    color:#fff; box-shadow:0 20px 40px rgba(0,0,0,0.35);
+  }
+  .cover-card .symbol{ font-size:40px; margin-bottom:14px; }
+  .cover-card h3{ font-family:'Fraunces', serif; font-size:26px; line-height:1.15; margin-bottom:8px; }
+  .cover-card .subtitle{ font-size:14px; opacity:0.85; margin-bottom:14px; }
+  .cover-card .tagline{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; opacity:0.75; text-transform:uppercase; letter-spacing:0.05em; }
+
+  /* DIFFERENTIATORS - chapter list */
+  .diff-list{ display:flex; flex-direction:column; }
+  .diff-item{
+    display:grid; grid-template-columns: 90px 1fr 1fr; gap:24px;
+    padding:28px 0; border-top:1px solid var(--line);
+    align-items:start;
+  }
+  .diff-item:last-child{ border-bottom:1px solid var(--line); }
+  @media (max-width:750px){ .diff-item{ grid-template-columns:1fr; gap:6px; } }
+  .diff-item .tag{ font-family:'Fraunces', serif; font-style:italic; color:var(--gold); font-size:15px; }
+  .diff-item h3{ font-size:19px; }
+  .diff-item .them{ color:var(--slate); font-size:14px; line-height:1.6;}
+  .diff-item .us{ color:var(--paper); font-size:14px; line-height:1.6;}
+  .diff-item .small-label{ font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--slate); display:block; margin-bottom:4px;}
+
+  /* PRICING */
+  .pricing-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media (max-width:800px){ .pricing-grid{ grid-template-columns:1fr; } }
+  .price-card{
+    background:var(--ink-2); border:1px solid var(--line); border-radius:8px; padding:28px;
+    display:flex; flex-direction:column;
+  }
+  .price-card.featured{ border-color:var(--gold); position:relative; }
+  .price-card.featured::before{
+    content:"MAIS ESCOLHIDO"; position:absolute; top:-11px; left:28px;
+    background:var(--gold); color:var(--ink); font-size:10.5px; font-weight:700;
+    padding:3px 10px; border-radius:3px; letter-spacing:0.05em;
+  }
+  .price-card h3{ font-size:20px; margin-bottom:6px;}
+  .price-card .price{ font-family:'Fraunces', serif; font-size:34px; margin:14px 0; }
+  .price-card .price span{ font-size:14px; color:var(--slate); font-family:'IBM Plex Sans', sans-serif; }
+  .price-card ul{ list-style:none; margin:18px 0; flex:1; }
+  .price-card li{ font-size:13.5px; color:var(--paper-dim); padding:7px 0; padding-left:18px; position:relative; }
+  .price-card li::before{ content:"—"; position:absolute; left:0; color:var(--gold); }
+
+  /* FINAL CTA */
+  .final-cta{ text-align:center; padding:110px 0 130px; }
+  .final-cta h2{ font-size:clamp(30px,4.5vw,46px); max-width:640px; margin:0 auto 20px; line-height:1.15;}
+  .final-cta p{ color:var(--paper-dim); margin-bottom:36px; }
+
+  footer{ border-top:1px solid var(--line); padding:32px 0; font-size:13px; color:var(--slate); }
+  footer .wrap{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .page{ animation:none; }
+    .cursor{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">Escriba<span class="mark">.</span></div>
+    <div class="links">
+      <a href="#demo">Demonstração</a>
+      <a href="#diferenciais">Diferenciais</a>
+      <a href="#precos">Preços</a>
+    </div>
+    <a class="cta-nav" href="#demo">Escrever agora</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Todo especialista carrega<br>um livro <em>inacabado</em>.</h1>
+      <p class="lede">O Escriba transforma o que você já sabe em um ebook completo — estruturado, revisado e pronto para vender. Não é um gerador de texto solto: é um coautor que entende de livro.</p>
+      <div class="btn-row">
+        <a class="btn-primary" href="#demo">Gerar meu primeiro capítulo</a>
+        <a class="btn-ghost" href="#diferenciais">Ver o que muda</a>
+      </div>
+    </div>
+    <div class="book-visual">
+      <div class="page">
+        <div class="cap">Capítulo 3</div>
+        <h3>O erro que ninguém te conta</h3>
+        <p>Antes de vender o primeiro exemplar, a maioria dos autores comete o mesmo engano: escrevem para impressionar, não para resolver. Este capítulo trata do que realmente...</p>
+      </div>
+      <div class="page"></div>
+      <div class="page"></div>
+    </div>
+  </div>
+</section>
+
+<section class="proof" aria-label="números">
+  <div class="wrap">
+    <div class="proof-item"><div class="num mono">3</div><div class="label">formatos de exportação reais<br>(EPUB · PDF · Kindle)</div></div>
+    <div class="proof-item"><div class="num mono">1</div><div class="label">preço por plano —<br>sem créditos escondidos</div></div>
+    <div class="proof-item"><div class="num mono">pt · en · es</div><div class="label">seu livro pronto<br>para vender fora do Brasil</div></div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <div class="chapter-marker"><span class="num">Capítulo 1 — A ideia</span><span class="rule"></span></div>
+    <h2 style="font-size:32px; margin-bottom:10px;">Escreva o primeiro parágrafo agora</h2>
+    <p style="color:var(--paper-dim); max-width:560px;">Sem cadastro. Descreva o tema do seu ebook e veja o Escriba estruturar e escrever um capítulo de exemplo, ao vivo.</p>
+
+    <div class="demo-panel">
+      <div class="demo-grid">
+        <div>
+          <label for="tema">Sobre o que é o seu ebook?</label>
+          <input type="text" id="tema" placeholder="Ex: como organizar as finanças de um consultório odontológico">
+
+          <div class="field-row">
+            <div>
+              <label for="publico">Público-alvo</label>
+              <select id="publico">
+                <option>Empreendedores iniciantes</option>
+                <option>Profissionais de saúde</option>
+                <option>Criadores de conteúdo</option>
+                <option>Pais e educadores</option>
+                <option>Investidores iniciantes</option>
+              </select>
+            </div>
+            <div>
+              <label for="tom">Tom de voz</label>
+              <select id="tom">
+                <option>Direto e prático</option>
+                <option>Acolhedor e didático</option>
+                <option>Técnico e autoritativo</option>
+                <option>Inspirador</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="gen-btn" id="genBtn" onclick="gerarCapitulo()">Gerar capítulo de exemplo</button>
+          <button class="gen-btn" id="nextBtn" style="background:var(--ink); border:1px solid var(--gold); color:var(--gold); margin-top:10px; display:none;" onclick="gerarProximoCapitulo()">Gerar próximo capítulo</button>
+          <button class="gen-btn" id="coverBtn" style="background:var(--gold); color:var(--ink); margin-top:10px; display:none;" onclick="gerarCapa()">Gerar capa do livro</button>
+          <div class="err" id="errBox" style="display:none;"></div>
+        </div>
+
+        <div class="output-box" id="output">
+          <span class="placeholder">Seu capítulo de exemplo aparece aqui — com título, gancho de abertura e primeiros parágrafos escritos no tom que você escolher.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="diferenciais">
+  <div class="wrap">
+    <div class="chapter-marker"><span class="num">Capítulo 2 — O que muda de verdade</span><span class="rule"></span></div>
+    <h2 style="font-size:32px; margin-bottom:8px;">A maioria dos geradores de ebook para no texto.<br>O Escriba vai até a venda.</h2>
+
+    <div class="diff-list">
+      <div class="diff-item">
+        <div class="tag mono">01</div>
+        <div><h3>Exportação real</h3></div>
+        <div>
+          <span class="small-label">Ferramentas comuns</span>
+          <div class="them">Entregam um bloco de texto para você copiar e formatar manualmente.</div>
+          <span class="small-label" style="margin-top:10px;">Escriba</span>
+          <div class="us">Exporta o arquivo pronto em EPUB, PDF e Kindle (MOBI), com capítulos, sumário e capa já incorporados.</div>
+        </div>
+      </div>
+
+      <div class="diff-item">
+        <div class="tag mono">02</div>
+        <div><h3>Feito para vender</h3></div>
+        <div>
+          <span class="small-label">Ferramentas comuns</span>
+          <div class="them">Focam só em gerar conteúdo — o título e a categoria ficam por sua conta.</div>
+          <span class="small-label" style="margin-top:10px;">Escriba</span>
+          <div class="us">Sugere título, subtítulo e categorias otimizados para a busca da Amazon KDP, com base no que já vende no seu nicho.</div>
+        </div>
+      </div>
+
+      <div class="diff-item">
+        <div class="tag mono">03</div>
+        <div><h3>Um capítulo por vez</h3></div>
+        <div>
+          <span class="small-label">Ferramentas comuns</span>
+          <div class="them">Geram o livro inteiro de uma vez, difícil de revisar ou ajustar o rumo.</div>
+          <span class="small-label" style="margin-top:10px;">Escriba</span>
+          <div class="us">Você aprova a estrutura, depois escreve e revisa capítulo por capítulo — como um coautor de verdade.</div>
+        </div>
+      </div>
+
+      <div class="diff-item">
+        <div class="tag mono">04</div>
+        <div><h3>Preço sem letra miúda</h3></div>
+        <div>
+          <span class="small-label">Ferramentas comuns</span>
+          <div class="them">Usam sistemas de "créditos" que somem antes de terminar o projeto.</div>
+          <span class="small-label" style="margin-top:10px;">Escriba</span>
+          <div class="us">Um plano, um preço, sem limite escondido de gerações dentro do seu uso normal.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="precos">
+  <div class="wrap">
+    <div class="chapter-marker"><span class="num">Capítulo 3 — O investimento</span><span class="rule"></span></div>
+    <h2 style="font-size:32px; margin-bottom:32px;">Planos claros, sem pegadinha</h2>
+
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3>Rascunho</h3>
+        <div class="price">Grátis</div>
+        <ul>
+          <li>1 ebook curto (até 8 capítulos)</li>
+          <li>Exportação em PDF</li>
+          <li>Estrutura sugerida por IA</li>
+        </ul>
+        <a class="btn-ghost" style="text-align:center;" href="#demo">Começar de graça</a>
+      </div>
+      <div class="price-card featured">
+        <h3>Autor</h3>
+        <div class="price">R$ 47<span>/mês</span></div>
+        <ul>
+          <li>Ebooks ilimitados</li>
+          <li>Exportação EPUB, PDF e Kindle</li>
+          <li>Capa gerada por IA</li>
+          <li>Otimização para Amazon KDP</li>
+          <li>pt-BR, inglês e espanhol</li>
+        </ul>
+        <a class="btn-primary" style="text-align:center;" href="#demo">Assinar Autor</a>
+      </div>
+      <div class="price-card">
+        <h3>Editora</h3>
+        <div class="price">R$ 197<span>/mês</span></div>
+        <ul>
+          <li>Tudo do plano Autor</li>
+          <li>Múltiplos autores na conta</li>
+          <li>Marca própria (white-label)</li>
+          <li>Suporte prioritário</li>
+        </ul>
+        <a class="btn-ghost" style="text-align:center;" href="#demo">Falar com o time</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="wrap">
+    <h2>Seu livro não precisa mais<br>ficar só na sua cabeça.</h2>
+    <p>Comece pelo primeiro capítulo. É grátis e leva menos de dois minutos.</p>
+    <a class="btn-primary" href="#demo">Escrever meu primeiro capítulo</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>© 2026 Escriba. Feito para quem tem algo a dizer.</div>
+    <div class="mono">pt-BR · en · es</div>
+  </div>
+</footer>
+
+<script>
+// estado do livro em construção nesta sessão
+let bookState = {
+  tema: '',
+  publico: '',
+  tom: '',
+  chapterCount: 0,
+  history: [] // { role: 'user' | 'assistant', content: string }
+};
+
+function getEls(){
+  return {
+    genBtn: document.getElementById('genBtn'),
+    nextBtn: document.getElementById('nextBtn'),
+    coverBtn: document.getElementById('coverBtn'),
+    output: document.getElementById('output'),
+    errBox: document.getElementById('errBox')
+  };
+}
+
+function showError(message){
+  const { errBox } = getEls();
+  errBox.textContent = message;
+  errBox.style.display = 'block';
+}
+
+function clearError(){
+  document.getElementById('errBox').style.display = 'none';
+}
+
+// chamada central à API, com o erro real exposto (não escondido atrás de uma mensagem genérica)
+async function callClaude(messages){
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1200,
+      messages: messages
+    })
+  });
+
+  let data;
+  try{
+    data = await response.json();
+  } catch(parseErr){
+    throw new Error('A resposta não veio em JSON válido (status ' + response.status + ').');
+  }
+
+  if(!response.ok){
+    const apiMsg = (data && data.error && data.error.message) ? data.error.message : JSON.stringify(data);
+    throw new Error('Erro da API (' + response.status + '): ' + apiMsg);
+  }
+
+  const text = (data.content || [])
+    .map(block => block.text || "")
+    .join("\n")
+    .trim();
+
+  if(!text){
+    throw new Error('A API respondeu, mas sem texto de conteúdo. Resposta bruta: ' + JSON.stringify(data).slice(0,300));
+  }
+
+  return text;
+}
+
+function appendChapterToOutput(chapterNumber, text, isFirst){
+  const { output } = getEls();
+  if(isFirst){
+    output.innerHTML = '';
+  }
+  const block = document.createElement('div');
+  block.className = 'chapter-block';
+  block.innerHTML = '<span class="chap-label">Capítulo ' + chapterNumber + '</span>';
+  const p = document.createElement('div');
+  p.textContent = text;
+  block.appendChild(p);
+  output.appendChild(block);
+  output.scrollTop = output.scrollHeight;
+}
+
+async function gerarCapitulo(){
+  const tema = document.getElementById('tema').value.trim();
+  const publico = document.getElementById('publico').value;
+  const tom = document.getElementById('tom').value;
+  const { genBtn, nextBtn, coverBtn } = getEls();
+
+  clearError();
+
+  if(!tema){
+    showError('Conte rapidamente sobre o que é o seu ebook antes de gerar.');
+    return;
+  }
+
+  bookState = { tema, publico, tom, chapterCount: 0, history: [] };
+
+  genBtn.disabled = true;
+  genBtn.textContent = 'Escrevendo...';
+
+  const prompt = `Você é um coautor de ebooks profissional em português do Brasil.
+Tema do ebook: "${tema}"
+Público-alvo: ${publico}
+Tom de voz: ${tom}
+
+Escreva o "Capítulo 1" deste ebook, com:
+1. Um título de capítulo forte (uma linha)
+2. Um gancho de abertura (1-2 frases que prendem o leitor)
+3. Dois ou três parágrafos curtos de conteúdo real e útil sobre o tema
+
+Responda apenas com o texto do capítulo, sem comentários extras, sem markdown, formatado como texto corrido pronto para leitura.`;
+
+  try{
+    const text = await callClaude([{ role: 'user', content: prompt }]);
+    bookState.chapterCount = 1;
+    bookState.history.push({ role: 'user', content: prompt });
+    bookState.history.push({ role: 'assistant', content: text });
+
+    appendChapterToOutput(1, text, true);
+    nextBtn.style.display = 'block';
+    coverBtn.style.display = 'block';
+  } catch(e){
+    showError('Não foi possível gerar agora. ' + e.message);
+  } finally {
+    genBtn.disabled = false;
+    genBtn.textContent = 'Gerar novo ebook (reinicia)';
+  }
+}
+
+async function gerarProximoCapitulo(){
+  const { nextBtn } = getEls();
+  clearError();
+
+  if(bookState.chapterCount === 0){
+    showError('Gere o Capítulo 1 primeiro.');
+    return;
+  }
+
+  nextBtn.disabled = true;
+  nextBtn.textContent = 'Escrevendo próximo capítulo...';
+
+  const nextNumber = bookState.chapterCount + 1;
+  const continuationPrompt = `Continue o mesmo ebook em português do Brasil, mantendo o tema "${bookState.tema}", o público-alvo (${bookState.publico}) e o tom de voz (${bookState.tom}).
+
+Escreva agora o "Capítulo ${nextNumber}", dando continuidade lógica ao que já foi escrito nos capítulos anteriores (não repita o conteúdo já apresentado). Inclua:
+1. Um título de capítulo forte (uma linha)
+2. Dois ou três parágrafos curtos de conteúdo real e útil, avançando o raciocínio do livro
+
+Responda apenas com o texto do capítulo, sem comentários extras, sem markdown.`;
+
+  const messages = [...bookState.history, { role: 'user', content: continuationPrompt }];
+
+  try{
+    const text = await callClaude(messages);
+    bookState.chapterCount = nextNumber;
+    bookState.history.push({ role: 'user', content: continuationPrompt });
+    bookState.history.push({ role: 'assistant', content: text });
+
+    appendChapterToOutput(nextNumber, text, false);
+  } catch(e){
+    showError('Não foi possível gerar o próximo capítulo. ' + e.message);
+  } finally {
+    nextBtn.disabled = false;
+    nextBtn.textContent = 'Gerar próximo capítulo';
+  }
+}
+
+async function gerarCapa(){
+  const { coverBtn, output } = getEls();
+  clearError();
+
+  if(bookState.chapterCount === 0){
+    showError('Gere pelo menos o Capítulo 1 antes de criar a capa.');
+    return;
+  }
+
+  coverBtn.disabled = true;
+  coverBtn.textContent = 'Projetando a capa...';
+
+  const coverPrompt = `Com base neste ebook (tema: "${bookState.tema}", público: ${bookState.publico}, tom: ${bookState.tom}) e nos capítulos já escritos nesta conversa, crie um conceito de capa.
+
+Responda APENAS com um JSON válido, sem markdown, sem crases, no formato exato:
+{"title": "...", "subtitle": "...", "tagline": "...", "palette": ["#hex1", "#hex2"], "symbol": "um único emoji que representa visualmente o tema"}
+
+O "title" deve ser um título de livro vendável (curto). O "subtitle" complementa o título. O "tagline" é uma frase curta de contracapa. A "palette" deve ter 2 cores em hexadecimal que combinem com o tema e o tom de voz.`;
+
+  const messages = [...bookState.history, { role: 'user', content: coverPrompt }];
+
+  try{
+    const raw = await callClaude(messages);
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const cover = JSON.parse(clean);
+
+    const card = document.createElement('div');
+    card.className = 'cover-card';
+    const c1 = (cover.palette && cover.palette[0]) || '#14171F';
+    const c2 = (cover.palette && cover.palette[1]) || '#9A3B32';
+    card.style.background = 'linear-gradient(160deg, ' + c1 + ', ' + c2 + ')';
+    card.innerHTML =
+      '<div class="symbol">' + (cover.symbol || '📖') + '</div>' +
+      '<h3>' + (cover.title || 'Seu Ebook') + '</h3>' +
+      '<div class="subtitle">' + (cover.subtitle || '') + '</div>' +
+      '<div class="tagline">' + (cover.tagline || '') + '</div>';
+
+    output.appendChild(card);
+    output.scrollTop = output.scrollHeight;
+  } catch(e){
+    showError('Não foi possível gerar a capa agora. ' + e.message);
+  } finally {
+    coverBtn.disabled = false;
+    coverBtn.textContent = 'Gerar nova capa';
+  }
+}
+</script>
+
+</body>
+</html>
