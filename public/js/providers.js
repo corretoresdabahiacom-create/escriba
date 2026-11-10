@@ -16,16 +16,16 @@ export class ProviderError extends Error {
 export const PROVIDERS = {
   groq: {
     label: 'Groq',
-    defaultModel: 'llama-3.3-70b-versatile',
+    defaultModel: 'openai/gpt-oss-120b',
     keyUrl: 'https://console.groq.com/keys',
-    note: 'Plano gratuito sem cartão. Rápido e com cota diária generosa.',
+    note: 'Plano gratuito sem cartão. Rápido; cota de ~1.000 requisições e ~200 mil tokens por dia.',
     envKey: 'GROQ_API_KEY', envModel: 'GROQ_MODEL',
   },
   gemini: {
     label: 'Google Gemini',
-    defaultModel: 'gemini-flash-latest',
+    defaultModel: 'gemini-3.5-flash-lite',
     keyUrl: 'https://aistudio.google.com/apikey',
-    note: 'Plano gratuito sem cartão (só conta Google). Cota diária costuma ser pequena.',
+    note: 'Plano gratuito sem cartão (só conta Google). Os modelos Flash maiores têm ~20 requisições/dia; os Flash-Lite, ~500.',
     envKey: 'GEMINI_API_KEY', envModel: 'GEMINI_MODEL',
   },
   openrouter: {

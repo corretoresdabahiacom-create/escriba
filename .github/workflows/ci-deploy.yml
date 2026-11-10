@@ -29,6 +29,16 @@ jobs:
       - run: npm ci
       - name: Testes unitários
         run: npm test
+      - name: Valida o EPUB com o EPUBCheck oficial (W3C)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/epubcheck" && cd "$RUNNER_TEMP/epubcheck"
+          gh release download v5.4.0 -R w3c/epubcheck -p 'epubcheck-*.zip'
+          unzip -q epubcheck-*.zip
+          cd "$GITHUB_WORKSPACE"
+          node scripts/make-sample-epub.mjs "$RUNNER_TEMP/sample.epub"
+          java -jar "$RUNNER_TEMP"/epubcheck/epubcheck-*/epubcheck.jar "$RUNNER_TEMP/sample.epub"
       - name: Instala Chromium e poppler (validação do PDF)
         run: |
           npx playwright install --with-deps chromium
