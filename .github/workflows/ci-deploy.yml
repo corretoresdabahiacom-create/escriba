@@ -89,6 +89,9 @@ jobs:
       - uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Como corrigir se o Pages não estiver habilitado
+        if: failure()
+        run: echo "::error title=GitHub Pages não habilitado::Em Settings > Pages, escolha Source = GitHub Actions (clique único) e rode o workflow de novo. Para não usar o Pages, crie a variável de repositório DEPLOY_PAGES=false."
       - name: Injeta a URL da API (opcional) em config.js
         run: |
           node -e "require('fs').writeFileSync('public/config.js', 'window.ESCRIBA_CONFIG = ' + JSON.stringify({ apiBase: (process.env.API_BASE || '').replace(/\/+\$/, '') }) + ';\n')"
